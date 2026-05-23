@@ -1,25 +1,5 @@
-/**
- * AppHeader Component
- *
- * Main application header with navigation, theme switcher, and user menu.
- * Features include:
- * - Sidebar toggle button
- * - Primary navigation links
- * - Notification and action icons
- * - Theme switcher (light/dark/auto)
- * - User dropdown menu
- * - Breadcrumb navigation
- * - Sticky positioning with scroll shadow effect
- *
- * @component
- * @example
- * return (
- *   <AppHeader />
- * )
- */
-
 import React, { useEffect, useRef } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -30,46 +10,42 @@ import {
   CHeader,
   CHeaderNav,
   CHeaderToggler,
-  CNavLink,
-  CNavItem,
-  useColorModes,
 } from '@coreui/react'
+
 import CIcon from '@coreui/icons-react'
 import {
-  cilBell,
-  cilContrast,
-  cilEnvelopeOpen,
-  cilList,
   cilMenu,
-  cilMoon,
-  cilSun,
+  cilAccountLogout,
 } from '@coreui/icons'
 
-import { AppBreadcrumb } from './index'
-import { AppHeaderDropdown } from './header/index'
-
-/**
- * AppHeader functional component
- *
- * Manages header UI including:
- * - Redux integration for sidebar state
- * - Theme management with CoreUI useColorModes hook
- * - Scroll-based shadow effect
- * - Responsive navigation
- *
- * @returns {React.ReactElement} Header component with navigation and controls
- */
 const AppHeader = () => {
   const headerRef = useRef()
-  const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  const token = localStorage.getItem("token")
+  const role = localStorage.getItem("role")
+  const username = localStorage.getItem("username")
+
+  const handleLogout = () => {
+    localStorage.clear()
+    navigate("/login")
+  }
+
+  const showSidebar =
+    location.pathname.includes("/doctors") ||
+    location.pathname.includes("/patients") ||
+    location.pathname.includes("/appointments")
+
   useEffect(() => {
     const handleScroll = () => {
-      headerRef.current &&
-        headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
+      headerRef.current?.classList.toggle(
+        'shadow-sm',
+        document.documentElement.scrollTop > 0
+      )
     }
 
     document.addEventListener('scroll', handleScroll)
@@ -77,99 +53,135 @@ const AppHeader = () => {
   }, [])
 
   return (
-    <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
-      <CContainer className="border-bottom px-4" fluid>
-        <CHeaderToggler
-          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-          style={{ marginInlineStart: '-14px' }}
-        >
-          <CIcon icon={cilMenu} size="lg" />
-        </CHeaderToggler>
-        <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
-            <CNavLink to="/dashboard" as={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
-          </CNavItem>
-        </CHeaderNav>
-        <CHeaderNav className="ms-auto">
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem>
-        </CHeaderNav>
-        <CHeaderNav>
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <CDropdown variant="nav-item" placement="bottom-end">
+    <CHeader
+      position="sticky"
+      className="mb-4 p-0"
+      ref={headerRef}
+      style={{
+        backgroundColor: "#ffffff",
+        borderBottom: "1px solid #e5e7eb",
+      }}
+    >
+      <CContainer fluid className="px-4">
+
+        {/* SIDEBAR */}
+        {showSidebar && (
+          <CHeaderToggler
+            onClick={() =>
+              dispatch({ type: 'set', sidebarShow: !sidebarShow })
+            }
+          >
+            <CIcon
+              icon={cilMenu}
+              size="lg"
+              style={{ color: "#111827" }}   // 🔥 CRNE 3 CRTICE
+            />
+          </CHeaderToggler>
+        )}
+
+        {/* NAV LINKS */}
+        <CHeaderNav className="ms-auto d-flex align-items-center gap-3">
+
+          <NavLink to="/" className="nav-link custom-link">Home</NavLink>
+          <NavLink to="/about" className="nav-link custom-link">About Us</NavLink>
+          <NavLink to="/services" className="nav-link custom-link">Services</NavLink>
+
+          <NavLink to="/doctors" className="nav-link custom-link">Doctors</NavLink>
+          <NavLink to="/patients" className="nav-link custom-link">Patients</NavLink>
+          <NavLink to="/appointments" className="nav-link custom-link">Appointments</NavLink>
+
+          <NavLink to="/help" className="nav-link custom-link">Help</NavLink>
+
+          {/* USER */}
+          <CDropdown className="ms-3">
             <CDropdownToggle caret={false}>
-              {colorMode === 'dark' ? (
-                <CIcon icon={cilMoon} size="lg" />
-              ) : colorMode === 'auto' ? (
-                <CIcon icon={cilContrast} size="lg" />
-              ) : (
-                <CIcon icon={cilSun} size="lg" />
-              )}
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  background: token ? "#2563eb" : "#666",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {username ? username[0].toUpperCase() : "?"}
+              </div>
             </CDropdownToggle>
+
             <CDropdownMenu>
-              <CDropdownItem
-                active={colorMode === 'light'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('light')}
-              >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Light
-              </CDropdownItem>
-              <CDropdownItem
-                active={colorMode === 'dark'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('dark')}
-              >
-                <CIcon className="me-2" icon={cilMoon} size="lg" /> Dark
-              </CDropdownItem>
-              <CDropdownItem
-                active={colorMode === 'auto'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('auto')}
-              >
-                <CIcon className="me-2" icon={cilContrast} size="lg" /> Auto
-              </CDropdownItem>
-            </CDropdownMenu>
+  {token ? (
+    <>
+      <div className="px-3 py-2">
+        <b>{username}</b><br />
+        <small>{role}</small>
+      </div>
+
+      {/* ADMIN ONLY */}
+      {role === "ADMIN" && (
+        <CDropdownItem as={NavLink} to="/register">
+          Register Doctor
+        </CDropdownItem>
+      )}
+
+      <CDropdownItem onClick={handleLogout}>
+        <CIcon icon={cilAccountLogout} className="me-2" />
+        Logout
+      </CDropdownItem>
+    </>
+  ) : (
+    <>
+      <CDropdownItem as={NavLink} to="/login">
+        Login
+      </CDropdownItem>
+
+      <CDropdownItem as={NavLink} to="/register">
+        Register
+      </CDropdownItem>
+    </>
+  )}
+</CDropdownMenu>
           </CDropdown>
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <AppHeaderDropdown />
+
         </CHeaderNav>
       </CContainer>
-      <CContainer className="px-4" fluid>
-        <AppBreadcrumb />
-      </CContainer>
+
+      {/* HOVER STYLE FIX */}
+      <style>{`
+        .custom-link {
+          color: #111 !important;
+          font-weight: 500;
+          position: relative;
+          transition: 0.25s ease;
+          text-decoration: none;
+        }
+
+        .custom-link:hover {
+          color: #2563eb !important;
+          text-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .custom-link::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: -4px;
+          width: 0%;
+          height: 2px;
+          background: #2563eb;
+          transition: 0.3s;
+        }
+
+        .custom-link:hover::after {
+          width: 100%;
+        }
+      `}</style>
     </CHeader>
   )
 }
 
-export default AppHeader
+export default AppHeader;

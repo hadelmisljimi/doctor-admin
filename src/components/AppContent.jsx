@@ -1,7 +1,7 @@
 /**
  * AppContent Component
  *
- * Main content area that renders routes defined in routes.js.
+ * Main content area that renders routes defined in routes.jsx.
  * Handles lazy loading with Suspense and provides a loading spinner
  * while components are being loaded.
  *
@@ -22,8 +22,9 @@ import React, { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
 
+
 // routes config
-import { routes } from '../routes'
+import { routes } from '../routes.jsx'
 
 /**
  * AppContent functional component
@@ -42,21 +43,20 @@ const AppContent = () => {
     <CContainer className="px-4" lg>
       <Suspense fallback={<CSpinner color="primary" />}>
         <Routes>
-          {routes.map((route, idx) => {
-            return (
-              route.element && (
-                <Route
-                  key={idx}
-                  path={route.path}
-                  exact={route.exact}
-                  name={route.name}
-                  element={<route.element />}
-                />
-              )
-            )
-          })}
-          <Route path="/" element={<Navigate to="dashboard" replace />} />
-        </Routes>
+  {routes.map((route, idx) => {
+    const Element = route.element
+
+    if (!Element) return null
+
+    return (
+      <Route
+        key={idx}
+        path={route.path}
+        element={<Element />}
+      />
+    )
+  })}
+</Routes>
       </Suspense>
     </CContainer>
   )
