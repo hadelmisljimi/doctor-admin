@@ -1,66 +1,33 @@
 import React from "react";
 import PrivateRoute from "./routes/PrivateRoute";
 
-
+// lazy pages
 const Home = React.lazy(() => import("./views/home/Home"));
 const AboutUs = React.lazy(() => import("./views/about/AboutUs"));
 const Services = React.lazy(() => import("./views/services/Services"));
-
-// LAZY PAGES
 const Doctors = React.lazy(() => import("./views/doctors/Doctors"));
 const Patients = React.lazy(() => import("./views/patients/Patients"));
 const Help = React.lazy(() => import("./views/help/Help"));
 
-const Appointments = React.lazy(() =>
-  import("./views/appointments/Appointments")
-);
+const Appointments = React.lazy(() => import("./views/appointments/Appointments"));
+const BookAppointment = React.lazy(() => import("./views/appointments/BookAppointment"));
+const DeleteAppointment = React.lazy(() => import("./views/appointments/DeleteAppointment"));
+const CompleteAppointment = React.lazy(() => import("./views/appointments/CompleteAppointment"));
+const CancelAppointment = React.lazy(() => import("./views/appointments/CancelAppointment"));
 
-const BookAppointment = React.lazy(() =>
-  import("./views/appointments/BookAppointment")
-);
+const DeletePatients = React.lazy(() => import("./views/patients/DeletePatients"));
+const DeleteDoctors = React.lazy(() => import("./views/doctors/DeleteDoctors"));
+const EditDoctors = React.lazy(() => import("./views/doctors/EditDoctors"));
+const AddDoctors = React.lazy(() => import("./views/doctors/AddDoctors"));
+const AddPatients = React.lazy(() => import("./views/patients/AddPatients"));
+const EditPatients = React.lazy(() => import("./views/patients/EditPatients"));
 
-const DeleteAppointment = React.lazy(() =>
-  import("./views/appointments/DeleteAppointment")
-);
-
-const CompleteAppointment = React.lazy(() =>
-  import("./views/appointments/CompleteAppointment")
-);
-
-const CancelAppointment = React.lazy(() =>
-  import("./views/appointments/CancelAppointment")
-);
-
-const DeletePatients = React.lazy(() =>
-  import("./views/patients/DeletePatients")
-);
-
-const DeleteDoctors = React.lazy(() =>
-  import("./views/doctors/DeleteDoctors")
-);
-
-const EditDoctors = React.lazy(() =>
-  import("./views/doctors/EditDoctors")
-);
-
-const AddDoctors = React.lazy(() =>
-  import("./views/doctors/AddDoctors")
-);
-
-const AddPatients = React.lazy(() =>
-  import("./views/patients/AddPatients")
-);
-const EditPatients = React.lazy(() =>
-  import("./views/patients/EditPatients")
-);
-
-
-// AUTH
 const Login = React.lazy(() => import("./views/pages/login/Login"));
 const Register = React.lazy(() => import("./views/pages/register/Register"));
 const Authorize = React.lazy(() => import("./views/pages/authorize/Authorize"));
 
-// WRAPPERS (ISPRAVNO)
+/* ===== GUARDS (IMPORTANT FIX) ===== */
+
 const BookAppointmentGuard = () => (
   <PrivateRoute roles={["PATIENT", "ADMIN", "DOCTOR"]}>
     <BookAppointment />
@@ -92,119 +59,64 @@ const DeletePatientsGuard = () => (
 );
 
 const DeleteDoctorsGuard = () => (
-  <PrivateRoute roles={["ADMIN" ]}>
+  <PrivateRoute roles={["ADMIN"]}>
     <DeleteDoctors />
   </PrivateRoute>
 );
+
 const EditDoctorsGuard = () => (
-  <PrivateRoute roles={["ADMIN" ]}>
+  <PrivateRoute roles={["ADMIN"]}>
     <EditDoctors />
   </PrivateRoute>
 );
+
 const AddDoctorsGuard = () => (
-  <PrivateRoute roles={["ADMIN" ]}>
+  <PrivateRoute roles={["ADMIN"]}>
     <AddDoctors />
   </PrivateRoute>
 );
+
 const AddPatientsGuard = () => (
   <PrivateRoute roles={["PATIENT", "ADMIN", "DOCTOR"]}>
     <AddPatients />
   </PrivateRoute>
 );
+
 const EditPatientsGuard = () => (
-  <PrivateRoute roles={[ "ADMIN", "DOCTOR"]}>
+  <PrivateRoute roles={["ADMIN", "DOCTOR"]}>
     <EditPatients />
   </PrivateRoute>
 );
 
+/* ===== ROUTES ===== */
+
 export const routes = [
-  {
-    path: "/",
-    element: Home,
-  },
+  { path: "/", element: <Home /> },
+  { path: "/about", element: <AboutUs /> },
+  { path: "/services", element: <Services /> },
+  { path: "/doctors", element: <Doctors /> },
+  { path: "/patients", element: <Patients /> },
+  { path: "/help", element: <Help /> },
 
-{
-  path: "/about",
-  name: "About Us",
-  element: AboutUs,
-},
-{
-  path: "/services",
-  name: "Services",
-  element: Services,
-},
+  { path: "/appointments", element: <Appointments /> },
 
-  // CUSTOM
-  { path: "/doctors", name: "Doctors", element: Doctors },
-  { path: "/patients", name: "Patients", element: Patients },
+  { path: "/appointments/book", element: <BookAppointmentGuard /> },
+  { path: "/appointments/delete", element: <DeleteAppointmentGuard /> },
+  { path: "/appointments/completed", element: <CompleteAppointmentGuard /> },
+  { path: "/appointments/cancelled", element: <CancelAppointmentGuard /> },
 
-//help
-  { path: "/help", name: "Help", element: Help },
+  { path: "/patients/delete", element: <DeletePatientsGuard /> },
 
-  // APPOINTMENTS
-  { path: "/appointments", name: "All Appointments", element: Appointments },
+  { path: "/doctors/delete", element: <DeleteDoctorsGuard /> },
+  { path: "/doctors/edit", element: <EditDoctorsGuard /> },
+  { path: "/doctors/add", element: <AddDoctorsGuard /> },
 
-  {
-    path: "/appointments/book",
-    name: "Book Appointment",
-    element: BookAppointmentGuard,
-  },
+  { path: "/patients/add", element: <AddPatientsGuard /> },
+  { path: "/patients/edit", element: <EditPatientsGuard /> },
 
-  {
-    path: "/appointments/delete",
-    name: "Delete Appointment",
-    element: DeleteAppointmentGuard,
-  },
-
-  {
-    path: "/appointments/completed",
-    name: "Completed",
-    element: CompleteAppointmentGuard,
-  },
-
-  {
-    path: "/appointments/cancelled",
-    name: "Cancelled",
-    element: CancelAppointmentGuard,
-  },
-
-  {
-    path: "/patients/delete",
-    name: "Delete Patients",
-    element: DeletePatientsGuard,
-  },
-
-  {
-  path: "/doctors/delete",
-  name: "Delete Doctors",
-  element: DeleteDoctorsGuard,
-},
-{
-  path: "/doctors/edit",
-  name: "Edit Doctors",
-  element: EditDoctorsGuard,
-},
-
-{
-  path: "/doctors/add",
-  name: "Add Doctors",
-  element: AddDoctorsGuard,
-},
-{
-  path: "/patients/add",
-  name: "Add Patients",
-  element: AddPatientsGuard,
-},
-{
-  path: "/patients/edit",
-  name: "Edit Patients",
-  element: EditPatientsGuard,
-},
-
-  // AUTH
-  { path: "/login", name: "Login", element: Login },
-  { path: "/register", name: "Register", element: Register },
-  { path: "/authorize", name: "Authorize", element: Authorize },
+  { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
+  { path: "/authorize", element: <Authorize /> },
 ];
 
 export default routes;

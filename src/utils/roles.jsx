@@ -1,5 +1,5 @@
-export const getRole = () => localStorage.getItem("role");
+export default getRole = () => localStorage.getItem("role");
 
-export const isAdmin = () => getRole() === "ADMIN";
-export const isDoctor = () => getRole() === "DOCTOR";
-export const isPatient = () => getRole() === "PATIENT";
+export default isAdmin = () => getRole() === "ADMIN";
+export default isDoctor = () => getRole() === "DOCTOR";
+export default isPatient = () => getRole() === "PATIENT";

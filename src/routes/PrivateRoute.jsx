@@ -4,7 +4,6 @@ const PrivateRoute = ({ children, roles }) => {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  // NOT LOGGED IN
   if (!token) {
     return (
       <div style={styles.wrapper}>
@@ -18,24 +17,14 @@ const PrivateRoute = ({ children, roles }) => {
     );
   }
 
-  // ROLE CHECK
   if (roles && !roles.includes(role)) {
-    let title = "Access Denied";
-    let message = "You do not have permission to access this page.";
-
-    if (roles.includes("ADMIN") && roles.includes("DOCTOR")) {
-      title = "Doctor & Admin Only";
-      message = "This page can only be accessed by doctors or administrators.";
-    } else if (roles.length === 1 && roles.includes("ADMIN")) {
-      title = "Admin Only";
-      message = "This page can only be accessed by administrators.";
-    }
-
     return (
       <div style={styles.wrapper}>
         <div style={styles.card}>
-          <h1 style={styles.redTitle}>{title}</h1>
-          <p style={styles.text}>{message}</p>
+          <h1 style={styles.redTitle}>Access Denied</h1>
+          <p style={styles.text}>
+            You do not have permission to access this page.
+          </p>
         </div>
       </div>
     );
